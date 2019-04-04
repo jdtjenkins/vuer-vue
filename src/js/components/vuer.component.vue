@@ -17,8 +17,14 @@
                 @click="changeLayout('three-by-three')"
                 v-bind:class="{active: layout === 'three-by-three'}">3x3</button>
         </nav>
-        <div class="links" v-bind:class="[layout]">
+        <section class="links" v-bind:class="[layout]">
             <div class="media" v-for="link in links">
+                <div class="controls">
+                    <button
+                        type="button"
+                        name="button"
+                        @click="resetLink(link.id)">🐔</button>
+                </div>
                 <input
                     type="text"
                     v-if="!link.transformedLink"
@@ -27,6 +33,7 @@
                 <video
                     autoplay
                     controls
+                    loop
                     v-if="link.platform === 'gfycat'"
                     :poster="link.poster">
                     <source
@@ -34,8 +41,16 @@
                         :src="link.mp4"
                         type="video/mp4">
                 </video>
+                <img
+                    v-if="link.platform === 'image'"
+                    :src="link.transformedLink">
+                <iframe
+                    v-if="link.platform === 'embed'"
+                    :src="link.transformedLink"
+                    allowfullscreen="true"
+                    ></iframe>
             </div>
-        </div>
+        </section>
     </div>
 </template>
 
@@ -61,6 +76,11 @@
                 this.$store.dispatch('LinkStore/updateLink', {
                     id,
                     link,
+                })
+            },
+            resetLink(id){
+                this.$store.dispatch('LinkStore/resetLink', {
+                    id
                 })
             }
         },
@@ -108,16 +128,59 @@
 
         .links {
             display: grid;
-            grid-template-rows: 100%;
-            grid-template-columns: 100%;
+            grid-template-rows: repeat(1, 100%);
+            grid-template-columns: repeat(1, 100%);
 
             .media {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                position: relative;
+
+                &:hover {
+                    .controls {
+                        opacity: 1;
+                    }
+                }
+
+                .controls {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    opacity: 0;
+                    transition: all .2s ease-in-out;
+                    background: rgba(0,0,0,0);
+
+                    button {
+                        background: none;
+                        border: none;
+                        font-size: 1rem;
+                        padding: 0.5rem;
+                        cursor: pointer;
+                    }
+                }
 
                 video {
                     width: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+
+                img {
+                    width: auto;
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+
+                iframe {
+                    width: 100%;
+                    height: 100%;
+                    border: 0;
+                    background: none;
                 }
             }
 

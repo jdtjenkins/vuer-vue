@@ -1,3 +1,4 @@
+import { ActionContext } from 'vuex';
 import { LinkUtils } from '../utils/link.utils';
 
 interface updateLink {
@@ -5,9 +6,28 @@ interface updateLink {
     link: string;
 }
 
+interface Link {
+    id: number;
+    link: string;
+    show: boolean;
+    platform: string;
+    transformedLink: string;
+}
+
+interface State {
+        defaultLink: Partial<Link>;
+        links: Link[];
+}
+
 export default {
-    state: {
-        links: [
+    state: <State>{
+        defaultLink: {
+            link: null,
+            show: null,
+            platform: null,
+            transformedLink: null,
+        },
+        links: <Link[]>[
           {
             id: 1,
             link: null,
@@ -74,7 +94,7 @@ export default {
         ]
     },
     mutations: {
-        updateLink(state, payload: updateLink){
+        updateLink(state: State, payload: updateLink){
             state.links = state.links.map(link => {
                 if (link.id !== payload.id){
                     return link;
@@ -88,16 +108,21 @@ export default {
         }
     },
     actions: {
-        async updateLink(context, {id, link}: updateLink) {
-            console.log(id, link);
+        async updateLink(context: ActionContext<updateLink, State>, {id, link}: updateLink) {
             context.commit('updateLink', {
                 id,
                 ... await LinkUtils.linkSwitch(link),
             });
+        },
+        resetLink(context: ActionContext<State, State>, { id }: {id: number}){
+            context.commit('updateLink', {
+                id,
+                ...context.state.defaultLink,
+            })
         }
     },
     getters: {
-        getLinks(state) {
+        getLinks(state: State) {
             return state.links.map(link => link);
         }
     },
