@@ -21,6 +21,11 @@
                name="two-by-one"
                @click="changeLayout('two-by-one')"
                v-bind:class="{active: layout === 'two-by-one'}">2x1</button>
+           <button
+               type="button"
+               name="one-by-two"
+               @click="changeLayout('one-by-two')"
+               v-bind:class="{active: layout === 'one-by-two'}">1x2</button>
         </nav>
         <section class="links" v-bind:class="[layout]">
             <div class="media" v-for="link in links">
@@ -192,6 +197,11 @@
             &.two-by-one {
                 grid-template-rows: repeat(1, 50%);
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            &.one-by-two {
+                grid-template-rows: repeat(2, 50%);
+                grid-template-columns: repeat(1, 1fr);
             }
 
             &.two-by-two {
