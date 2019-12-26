@@ -1,6 +1,7 @@
 <template>
     <div class="vuer">
         <nav-component
+            :layout="layout"
             @changeLayout="changeLayout"
             @save="save"
             @load="load"
