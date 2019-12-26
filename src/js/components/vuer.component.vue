@@ -1,39 +1,18 @@
 <template>
     <div class="vuer">
-        <nav>
-            <button
-                type="button"
-                name="two-by-two"
-                @click="changeLayout('one-by-one')"
-                v-bind:class="{active: layout === 'one-by-one'}">1x1</button>
-            <button
-                type="button"
-                name="two-by-two"
-                @click="changeLayout('two-by-two')"
-                v-bind:class="{active: layout === 'two-by-two'}">2x2</button>
-            <button
-                type="button"
-                name="two-by-two"
-                @click="changeLayout('three-by-three')"
-                v-bind:class="{active: layout === 'three-by-three'}">3x3</button>
-           <button
-               type="button"
-               name="two-by-one"
-               @click="changeLayout('two-by-one')"
-               v-bind:class="{active: layout === 'two-by-one'}">2x1</button>
-           <button
-               type="button"
-               name="one-by-two"
-               @click="changeLayout('one-by-two')"
-               v-bind:class="{active: layout === 'one-by-two'}">1x2</button>
-        </nav>
+        <nav-component
+            @changeLayout="changeLayout"
+            @save="save"
+            @load="load"
+            ></nav-component>
         <section class="links" v-bind:class="[layout]">
             <div class="media" v-for="link in links">
                 <div class="controls">
                     <button
                         type="button"
                         name="button"
-                        @click="resetLink(link.id)">🐔</button>
+                        class="reset-button"
+                        @click="resetLink(link.id)">Reset</button>
                 </div>
                 <input
                     type="text"
@@ -67,16 +46,20 @@
 <script>
     import axios from 'axios';
     import { LinkUtils } from '../utils/link.utils';
+    import StorageService from '../services/storage.service';
+    import NavComponent from './nav.component';
 
     export default {
         name: 'vuer-component',
+        components: {
+            'nav-component': NavComponent,
+        },
         data() {
             return {
                 layout: 'two-by-two',
             }
         },
         created() {
-
         },
         methods: {
             changeLayout(layout) {
@@ -92,7 +75,19 @@
                 this.$store.dispatch('LinkStore/resetLink', {
                     id
                 })
-            }
+            },
+            setState(state) {
+                this.$store.dispatch('LinkStore/setState', state);
+            },
+            save() {
+                console.log('a');
+                StorageService.saveState(this.$store.state.LinkStore);
+            },
+            load() {
+                const newState = StorageService.loadState();
+
+                this.setState(newState);
+            },
         },
         computed: {
             links() {
@@ -110,31 +105,6 @@
         display: grid;
         grid-template-rows: 100%;
         grid-template-columns: 75px auto;
-
-        nav {
-            background-color: pink;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            flex-direction: column;
-
-            button {
-                width: 100%;
-                padding: 1rem 1rem;
-                font-size: 1rem;
-                background: none;
-                border: 0;
-                cursor: pointer;
-
-                &:hover {
-                    background: darken(pink, 5%);
-                }
-
-                &.active {
-                    background: darken(pink, 10%);
-                }
-            }
-        }
 
         .links {
             display: grid;
@@ -164,13 +134,17 @@
                     opacity: 0;
                     transition: all .2s ease-in-out;
                     background: rgba(0,0,0,0);
+                    padding: 1rem;
 
                     button {
-                        background: none;
+                        background: pink;
                         border: none;
+                        border-radius: 100px;
                         font-size: 1rem;
-                        padding: 0.5rem;
+                        padding: 0.5rem 1rem;
                         cursor: pointer;
+                        color: #383F51;
+                        box-shadow: 0 0 5px rgba(0,0,0,0.2);
                     }
                 }
 
@@ -195,13 +169,13 @@
             }
 
             &.two-by-one {
-                grid-template-rows: repeat(1, 50%);
+                grid-template-rows: 100%;
                 grid-template-columns: repeat(2, 1fr);
             }
 
             &.one-by-two {
                 grid-template-rows: repeat(2, 50%);
-                grid-template-columns: repeat(1, 1fr);
+                grid-template-columns: 100%;
             }
 
             &.two-by-two {

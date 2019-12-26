@@ -105,6 +105,11 @@ export default {
                     ...payload,
                 }
             })
+        },
+        setState(state: State, payload: State) {
+            state.links = [
+                ...payload.links,
+            ];
         }
     },
     actions: {
@@ -119,6 +124,9 @@ export default {
                 id,
                 ...context.state.defaultLink,
             })
+        },
+        setState(context: ActionContext<State, State>, newState: State) {
+            context.commit('setState', newState);
         }
     },
     getters: {

@@ -21,6 +21,14 @@ export class LinkUtils {
         if (link.includes('i.redd.it') || link.includes('i.redditmedia.com')){
             return LinkUtils.iReddit(link);
         }
+
+        if (link.includes('youtube')) {
+            return LinkUtils.youtube(link);
+        }
+
+        if (link.includes('twitch')) {
+            return LinkUtils.twitch(link);
+        }
     }
 
     public static async gfycat(link: string) {
@@ -81,4 +89,27 @@ export class LinkUtils {
             transformedLink: `https://www.eporner.com/embed/${ viewKey }`,
         }
     }
+
+    // https://www.youtube.com/watch?v=HNt_4IXhO3Q
+    public static async youtube(link: string) {
+        const viewKey = link.split('?v=').pop();
+
+        return {
+            link,
+            platform: 'embed',
+            transformedLink: `https://www.youtube.com/embed/${ viewKey }`,
+        }
+    }
+
+    // https://www.twitch.tv/claytonred
+    public static async twitch(link: string) {
+        const viewKey = link.split('/').pop();
+
+        return {
+            link,
+            platform: 'embed',
+            transformedLink: `https://player.twitch.tv?channel=${ viewKey }`,
+        }
+    }
+
 }
