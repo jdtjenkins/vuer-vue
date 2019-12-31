@@ -24,7 +24,7 @@
                     autoplay
                     controls
                     loop
-                    v-if="link.platform === 'gfycat'"
+                    v-if="link.platform === 'video'"
                     :poster="link.poster">
                     <source
                         v-if="link.mp4"
@@ -136,6 +136,7 @@
                     transition: all .2s ease-in-out;
                     background: rgba(0,0,0,0);
                     padding: 1rem;
+                    z-index: 2;
 
                     button {
                         background: pink;
@@ -153,12 +154,16 @@
                     width: 100%;
                     max-width: 100%;
                     max-height: 100%;
+                    z-index: 1;
+                    position: relative;
                 }
 
                 img {
                     width: auto;
                     max-width: 100%;
                     max-height: 100%;
+                    z-index: 1;
+                    position: relative;
                 }
 
                 iframe {
@@ -166,6 +171,8 @@
                     height: 100%;
                     border: 0;
                     background: none;
+                    z-index: 1;
+                    position: relative;
                 }
             }
 

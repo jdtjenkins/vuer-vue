@@ -10,6 +10,10 @@ export class LinkUtils {
             return LinkUtils.redditPost(link);
         }
 
+        if (link.includes('imgur')) {
+            return LinkUtils.imgur(link);
+        }
+
         if (link.includes('pornhub')){
             return LinkUtils.pornhub(link);
         }
@@ -38,7 +42,7 @@ export class LinkUtils {
 
         return {
             link,
-            platform: 'gfycat',
+            platform: 'video',
             transformedLink: link,
             mp4: apiData.data.gfyItem.mp4Url,
         };
@@ -61,6 +65,29 @@ export class LinkUtils {
     }
 
     public static async iReddit(link: string) {
+        return {
+            link,
+            platform: 'image',
+            transformedLink: link,
+        }
+    }
+
+    public static async imgur(link: string) {
+        const fileName = link.split('/').pop();
+        const fileHash = fileName.split('.')[0];
+        const fileType = fileName.split('.').pop();
+
+        if (fileType === 'gifv') {
+            const apiData = await axios.get(`https://api.imgur.com/3/image/${ fileHash }`);
+
+            return {
+                link,
+                platform: 'video',
+                transformedLink: link,
+                mp4: apiData.data.data.mp4,
+            };
+        }
+
         return {
             link,
             platform: 'image',
