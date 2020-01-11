@@ -9,7 +9,6 @@ import VuerComponent from './components/vuer.component';
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        console.log('loading service worker');
         navigator.serviceWorker.register('/service-worker.js');
     });
 }
