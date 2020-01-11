@@ -95,7 +95,7 @@
         ],
         data() {
             return {
-                savedStates: ['test'],
+                savedStates: [],
             }
         },
         methods: {
