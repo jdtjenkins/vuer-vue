@@ -3,11 +3,12 @@
         <nav-component
             :layout="layout"
             @changeLayout="changeLayout"
-            @save="save"
-            @load="load"
-            ></nav-component>
+            @save="saveBoard"
+            @load="loadBoard"
+            @delete="deleteBoard"
+        ></nav-component>
         <section class="links" v-bind:class="[layout]">
-            <div class="media" v-for="link in links">
+            <div class="media" v-for="link in links" v-bind:key="`${link.id} ${link.link}`">
                 <div class="controls">
                     <button
                         type="button"
@@ -17,6 +18,7 @@
                 </div>
                 <input
                     type="text"
+                    placeholder="Imgur, Gfycat, Youtube, Twitch url here"
                     v-if="!link.transformedLink"
                     :value="link.link"
                     @change="updateLink(link.id, $event.target.value)">
@@ -38,9 +40,10 @@
                     v-if="link.platform === 'embed'"
                     :src="link.transformedLink"
                     allowfullscreen="true"
-                    ></iframe>
+                ></iframe>
             </div>
         </section>
+        <portal-target name="modals"></portal-target>
     </div>
 </template>
 
@@ -66,6 +69,8 @@
             changeLayout(layout) {
                 this.layout = layout;
             },
+
+            // Current board links
             updateLink(id, link) {
                 this.$store.dispatch('LinkStore/updateLink', {
                     id,
@@ -80,15 +85,22 @@
             setState(state) {
                 this.$store.dispatch('LinkStore/setState', state);
             },
-            save() {
-                console.log('a');
-                StorageService.saveState(this.$store.state.LinkStore);
+
+            // Boards
+            saveBoard(payload) {
+                StorageService.save({
+                    state: this.$store.state.LinkStore,
+                    name: payload.name,
+                });
             },
-            load() {
-                const newState = StorageService.loadState();
+            loadBoard(name) {
+                const newState = StorageService.load(name);
 
                 this.setState(newState);
             },
+            deleteBoard(name) {
+                StorageService.delete(name);
+            }
         },
         computed: {
             links() {

@@ -51,6 +51,8 @@ export class LinkUtils {
     public static async redditPost(link: string) {
         const apiData = await axios.get(`${link}.json`);
 
+        console.log(apiData);
+
         const postData = apiData.data[0].data.children[0].data;
 
         if (postData.url.includes('gfycat')){
@@ -124,7 +126,7 @@ export class LinkUtils {
         return {
             link,
             platform: 'embed',
-            transformedLink: `https://www.youtube.com/embed/${ viewKey }`,
+            transformedLink: `https://www.youtube.com/embed/${ viewKey }?modestbranding=1`,
         }
     }
 

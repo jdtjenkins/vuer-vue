@@ -14,19 +14,19 @@ interface Link {
     transformedLink: string;
 }
 
-interface State {
-        defaultLink: Partial<Link>;
-        links: Link[];
+export interface IState {
+        links?: Link[];
+}
+
+const defaultLink = {
+    link: null,
+    show: null,
+    platform: null,
+    transformedLink: null,
 }
 
 export default {
-    state: <State>{
-        defaultLink: {
-            link: null,
-            show: null,
-            platform: null,
-            transformedLink: null,
-        },
+    state: <IState>{
         links: <Link[]>[
           {
             id: 1,
@@ -94,7 +94,7 @@ export default {
         ]
     },
     mutations: {
-        updateLink(state: State, payload: updateLink){
+        updateLink(state: IState, payload: updateLink){
             state.links = state.links.map(link => {
                 if (link.id !== payload.id){
                     return link;
@@ -106,31 +106,31 @@ export default {
                 }
             })
         },
-        setState(state: State, payload: State) {
+        setState(state: IState, payload: IState) {
             state.links = [
                 ...payload.links,
             ];
         }
     },
     actions: {
-        async updateLink(context: ActionContext<updateLink, State>, {id, link}: updateLink) {
+        async updateLink(context: ActionContext<updateLink, IState>, {id, link}: updateLink) {
             context.commit('updateLink', {
                 id,
                 ... await LinkUtils.linkSwitch(link),
             });
         },
-        resetLink(context: ActionContext<State, State>, { id }: {id: number}){
+        resetLink(context: ActionContext<IState, IState>, { id }: {id: number}){
             context.commit('updateLink', {
                 id,
-                ...context.state.defaultLink,
+                ...defaultLink,
             })
         },
-        setState(context: ActionContext<State, State>, newState: State) {
+        setState(context: ActionContext<IState, IState>, newState: IState) {
             context.commit('setState', newState);
         }
     },
     getters: {
-        getLinks(state: State) {
+        getLinks(state: IState) {
             return state.links.map(link => link);
         }
     },

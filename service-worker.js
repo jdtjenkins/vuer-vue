@@ -1,3 +1,5 @@
-import { precacheAndRoute } from 'workbox-precaching';
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js');
 
-precacheAndRoute([]);
+if (workbox) {
+    workbox.precaching.precacheAndRoute([]);
+}
