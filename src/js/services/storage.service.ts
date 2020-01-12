@@ -33,7 +33,7 @@ export default class StorageService {
             return parsedState;
         }
 
-        if (!state || !state[name]) {
+        if (!state || !parsedState[name]) {
             return {
                 links: [],
             };
