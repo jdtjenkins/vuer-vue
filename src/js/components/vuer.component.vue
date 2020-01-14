@@ -9,38 +9,29 @@
         ></nav-component>
         <section class="links" v-bind:class="[layout]">
             <div class="media" v-for="link in links" v-bind:key="`${link.id} ${link.link}`">
-                <div class="controls">
+                <div
+                    v-if="link.link"
+                    class="controls"
+                >
                     <button
                         type="button"
                         name="button"
                         class="reset-button"
                         @click="resetLink(link.id)">Reset</button>
                 </div>
+
                 <input
-                    type="text"
-                    placeholder="Imgur, Gfycat, Youtube, Twitch url here"
                     v-if="!link.transformedLink"
+                    type="text"
+                    placeholder="Reddit, Subreddit, Imgur, Gfycat, Youtube, Twitch url"
                     :value="link.link"
-                    @change="updateLink(link.id, $event.target.value)">
-                <video
-                    autoplay
-                    controls
-                    loop
-                    v-if="link.platform === 'video'"
-                    :poster="link.poster">
-                    <source
-                        v-if="link.mp4"
-                        :src="link.mp4"
-                        type="video/mp4">
-                </video>
-                <img
-                    v-if="link.platform === 'image'"
-                    :src="link.transformedLink">
-                <iframe
-                    v-if="link.platform === 'embed'"
-                    :src="link.transformedLink"
-                    allowfullscreen="true"
-                ></iframe>
+                    @change="updateLink(link.id, $event.target.value)"
+                >
+
+                <linkbox
+                    v-if="link.link"
+                    :link="link"
+                ></linkbox>
             </div>
         </section>
         <portal-target name="modals"></portal-target>
@@ -50,17 +41,26 @@
 <script>
     import axios from 'axios';
     import { LinkUtils } from '../utils/link.utils';
+
+    // Services
     import StorageService from '../services/storage.service';
+
+    // Components
     import NavComponent from './nav.component';
+    import Subreddit from './subreddit.component';
+    import Linkbox from './linkbox/linkbox.component';
 
     export default {
         name: 'vuer-component',
         components: {
             'nav-component': NavComponent,
+            'subreddit': Subreddit,
+            'linkbox': Linkbox,
         },
         data() {
             return {
                 layout: 'two-by-two',
+                test: 'hello',
             }
         },
         created() {
@@ -129,6 +129,9 @@
                 align-items: center;
                 justify-content: center;
                 position: relative;
+                flex-direction: column;
+                width: 100%;
+                height: 100%;
 
                 &:hover {
                     .controls {
@@ -186,6 +189,14 @@
                     z-index: 1;
                     position: relative;
                 }
+
+                .linkbox {
+                    width: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                    z-index: 1;
+                    position: relative;
+                }
             }
 
             &.two-by-one {
@@ -194,18 +205,18 @@
             }
 
             &.one-by-two {
-                grid-template-rows: repeat(2, 50%);
+                grid-template-rows: repeat(2, minmax(50%, 50%));
                 grid-template-columns: 100%;
             }
 
             &.two-by-two {
                 grid-template-rows: repeat(2, 50%);
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, 50%);
             }
 
             &.three-by-three {
-                grid-template-rows: repeat(3, 1fr);
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(3, 33%);
+                grid-template-columns: repeat(3, 33%);
             }
         }
 

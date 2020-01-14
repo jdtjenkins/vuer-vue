@@ -33,6 +33,10 @@ export class LinkUtils {
         if (link.includes('twitch')) {
             return LinkUtils.twitch(link);
         }
+
+        // if (link.includes('reddit.com/r/')) {
+        //     return LinkUtils.subreddit(link);
+        // }
     }
 
     public static async gfycat(link: string) {
@@ -138,6 +142,14 @@ export class LinkUtils {
             link,
             platform: 'embed',
             transformedLink: `https://player.twitch.tv?channel=${ viewKey }`,
+        }
+    }
+
+    public static async subreddit(link: string) {
+        return {
+            link,
+            platform: 'subreddit',
+            transformedLink: link,
         }
     }
 
