@@ -4,11 +4,18 @@
         autoplay
         controls
         loop
-        :poster="link.poster">
+        :poster="link.poster"
+    >
         <source
-        v-if="link.mp4"
-        :src="link.mp4"
-        type="video/mp4">
+            v-if="link.mp4"
+            :src="link.mp4"
+            type="video/mp4"
+        >
+        <source
+            v-else
+            :src="link.link"
+            type="video/mp4"
+        >
     </video>
 </template>
 

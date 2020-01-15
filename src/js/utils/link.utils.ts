@@ -10,6 +10,11 @@ export class LinkUtils {
             return LinkUtils.redditPost(link);
         }
 
+        /** This won't work for now. v.redd.it does not allow embedding videos */
+        // if (link.includes('v.redd.it')) {
+        //     return LinkUtils.vReddit(link);
+        // }
+
         if (link.includes('imgur')) {
             return LinkUtils.imgur(link);
         }
@@ -63,10 +68,23 @@ export class LinkUtils {
             return LinkUtils.gfycat(postData.url);
         }
 
+        if (postData.url.includes('v.redd.it')) {
+            const vRedditVideoUrl = apiData.data[0].data.children[0].data.secure_media.reddit_video.fallback_url;
+            return LinkUtils.vReddit(vRedditVideoUrl);
+        }
+
         return {
             link,
-			platform: postData.url.includes('v.redd.it') ? 'video' : 'image',
+			platform: 'image',
             transformedLink: postData.url,
+        }
+    }
+
+    public static async vReddit(link: string) {
+        return {
+            link,
+            platform: 'video',
+            transformedLink: link,
         }
     }
 
