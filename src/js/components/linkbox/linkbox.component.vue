@@ -6,17 +6,17 @@
         ></video-platform>
 
         <image-platform
-            v-if="link.platform === 'image'"
+            v-else-if="link.platform === 'image'"
             :link="link"
-        ><image-platform>
+        ></image-platform>
 
         <embed-platform
-            v-if="link.platform === 'embed'"
+            v-else-if="link.platform === 'embed'"
             :link="link"
         ></embed-platform>
 
         <subreddit
-            v-if="link.platform === 'subreddit'"
+            v-else-if="link.platform === 'subreddit'"
             :src="link.transformedLink"
         ></subreddit>
 

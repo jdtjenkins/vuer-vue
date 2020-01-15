@@ -65,7 +65,7 @@ export class LinkUtils {
 
         return {
             link,
-            platform: 'image',
+			platform: postData.url.includes('v.redd.it') ? 'video' : 'image',
             transformedLink: postData.url,
         }
     }
