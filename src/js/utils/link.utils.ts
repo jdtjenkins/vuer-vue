@@ -40,12 +40,14 @@ export class LinkUtils {
         }
 
         // if (link.includes('reddit.com/r/')) {
-        //     return LinkUtils.subreddit(link);
-        // }
+        if (link.match(new RegExp('reddit.com\/r\/.*\/$'))) {
+            return LinkUtils.subreddit(link);
+        }
     }
 
     public static async gfycat(link: string) {
-        const slug = link.split('/').pop();
+        let slug = link.split('/').pop();
+        slug = slug.replace('.gif', '');
 
         const apiData = await axios.get(`https://api.gfycat.com/v1/gfycats/${slug}`);
 
@@ -59,8 +61,6 @@ export class LinkUtils {
 
     public static async redditPost(link: string) {
         const apiData = await axios.get(`${link}.json`);
-
-        console.log(apiData);
 
         const postData = apiData.data[0].data.children[0].data;
 

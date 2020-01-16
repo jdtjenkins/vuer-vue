@@ -15,10 +15,10 @@
             :link="link"
         ></embed-platform>
 
-        <subreddit
+        <subreddit-platform
             v-else-if="link.platform === 'subreddit'"
-            :src="link.transformedLink"
-        ></subreddit>
+            :link="link.transformedLink"
+        ></subreddit-platform>
 
     </div>
 </template>
