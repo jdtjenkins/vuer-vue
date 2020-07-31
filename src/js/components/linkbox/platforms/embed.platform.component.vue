@@ -2,6 +2,7 @@
     <iframe
         :src="link.transformedLink"
         allowfullscreen="true"
+        scrolling="no"
     ></iframe>
 </template>
 

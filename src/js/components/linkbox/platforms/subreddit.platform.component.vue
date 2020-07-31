@@ -1,84 +1,229 @@
 <template>
-    <linkbox
-        v-if="links.length"
-        class="linkbox"
-        :link="currentLink"
-    ></linkbox>
+	<div class="wrapper">
+		<p
+			v-if="error"
+			class="error"
+			>
+			Cannot find
+			<a
+				:href="link"
+				target="_blank"
+				class="italic"
+			>{{ link }}</a>
+		</p>
+
+		<linkbox
+			v-else-if="links.length"
+			class="linkbox"
+			:link="currentLink"
+		></linkbox>
+
+		<div class="subreddit-controls">
+			<input
+				type="number"
+				v-model="intervalTime"
+			>
+			<a
+				:href="currentLink.link"
+				target="_blank"
+			>
+				<i>👆</i>
+			</a>
+			<button @click="back">
+				<i>👈</i>
+			</button>
+			<button @click="forward">
+				<i>👉</i>
+			</button>
+		</div>
+	</div>
 </template>
 
 <script>
-    import axios from 'axios';
+	import axios from 'axios';
 
-    // Components
-    import { Carousel, Slide } from 'vue-carousel';
+	// Components
+	import { Carousel, Slide } from 'vue-carousel';
 
-    // Utils
-    import { LinkUtils } from '../../../utils/link.utils';
+	// Utils
+	import { LinkUtils } from '../../../utils/link.utils';
 
-    export default {
-        name: 'subreddit-platform',
-        props: ['link'],
-        components: {
-            'linkbox': () => import('../linkbox.component.vue'),
-        },
-        data() {
-            return {
-                links: [],
-                pageSize: 25,
-                currentCount: 0,
-                currentPage: null,
-                nextPage: null,
-                timer: null,
-            }
-        },
-        methods: {
-            now() {
-                return performance.now();
-            }
-        },
-        computed: {
-            currentLink() {
-                if (this.links.length) {
-                    return this.links[this.currentCount];
-                }
-            },
-        },
-        async created() {
-            const response = await axios.get(`${ this.link }.json`);
+	export default {
+		name: 'subreddit-platform',
+		props: ['link'],
+		components: {
+			'linkbox': () => import('../linkbox.component.vue'),
+		},
+		data() {
+			return {
+				links: [],
+				pageSize: 25,
+				currentCount: 0,
+				currentPage: null,
+				after: null,
+				timer: null,
+				intervalTime: 30000,
+				error: null,
+			}
+		},
+		methods: {
+			now() {
+				return performance.now();
+			},
+			back() {
+				this.currentCount--;
+				this.setTimer();
+			},
+			async forward() {
+				if (this.currentCount + 1 > this.links.length - 1) {
+					await this.getLinks();
+				}
 
-            const links = [];
+				this.currentCount++;
 
-            for (let child of response.data.data.children) {
-                
-                if (child.data.selftext !== '' && child.data.is_self) {
-                    continue;
-                }
+				this.setTimer();
+			},
+			async getLinks() {
+				let response;
 
-                const linkData = await LinkUtils.linkSwitch(child.data.url);
+				try {
+					response = await axios.get(`${ this.link }.json${ this.after ? `?after=${ this.after }` : '' }`);
 
-                if (linkData) {
-                    links.push(linkData);
-                }
-            }
+					this.after = response.data.data.after;
+				} catch {
+					this.$emit('subreddit-not-found', {
+						link: this.link,
+					});
+					this.error = true;
+					return;
+				}
 
-            this.links = links;
+				const links = [];
 
-            this.timer = setInterval(() => {
-                if (this.currentCount + 1 > this.links.length) {
-                    return this.currentCount = 0;
-                }
+				for (let child of response.data.data.children) {
 
-                this.currentCount++;
-            }, 10000);
-        },
-        destroyed() {
-        }
-    }
+					if (child.data.selftext !== '' && child.data.is_self) {
+						continue;
+					}
+
+					try {
+						const linkData = await LinkUtils.linkSwitch(child.data.url);
+
+						if (linkData) {
+							links.push(linkData);
+						}
+					} catch(e) {
+						console.log(e);
+					}
+				}
+
+				this.links = [
+					...this.links,
+					...links,
+				];
+			},
+			setTimer(time = 10000) {
+				if (this.timer) {
+					clearInterval(this.timer);
+				}
+
+				this.timer = setInterval(async () => {
+					await this.forward();
+				}, this.intervalTime);
+			},
+		},
+		computed: {
+			currentLink() {
+				if (this.links.length) {
+					return this.links[this.currentCount];
+				}
+			},
+		},
+		async created() {
+			await this.getLinks();
+			await this.setTimer();
+		},
+	}
 </script>
 
 <style lang="scss" scoped>
-    .linkbox {
-        height: 100%;
-        width: 100%;
-    }
+	.wrapper {
+		height: 100%;
+		width: 100%;
+
+		&:hover {
+			.subreddit-controls {
+				opacity: 1;
+			}
+		}
+
+		.subreddit-controls {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			opacity: 0;
+			transition: all .2s ease-in-out;
+			background: rgba(0,0,0,0);
+			padding: 1rem;
+			z-index: 2;
+
+			*:not(:last-child) {
+				margin-right: 0.5rem;
+			}
+
+			a, button {
+				background: pink;
+				border: none;
+				border-radius: 100px;
+				font-size: 1rem;
+				padding: 0.5rem 1rem;
+				cursor: pointer;
+				color: #383F51;
+				box-shadow: 0 0 5px rgba(0,0,0,0.2);
+
+				i {
+					display: inline-block;
+					line-height: 0;
+					margin-bottom: 12px;
+				}
+			}
+
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			input {
+				border: none;
+				border-bottom: 1px solid #fff;
+				background: 0;
+				color: #fff;
+				width: 100px;
+				text-align: center;
+			}
+		}
+	}
+
+	.error {
+		padding: 0.5rem 0.75rem;
+		background-color: pink;
+		border-radius: 5px;
+		border: none;
+		box-shadow: 0 0 5px rgba(0,0,0,0.2);
+
+		.italic {
+			color: darken(pink, 15%);
+			text-decoration: none;
+			font-style: italic;
+
+			&:hover {
+				color: darken(pink, 20%);
+			}
+		}
+	}
+
 </style>

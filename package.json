@@ -1,6 +1,7 @@
 {
   "scripts": {
     "start": "npx parcel index.html",
+    "start-https": "npx parcel index.html --https",
     "build": "npx parcel build index.html && npm run service-worker",
     "service-worker": "npx workbox injectManifest workbox-config.js"
   },
