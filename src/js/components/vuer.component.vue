@@ -1,40 +1,44 @@
 <template>
 	<div class="vuer">
-		<nav-component
-			:layout="layout"
-			@changeLayout="changeLayout"
-			@save="saveBoard"
-			@load="loadBoard"
-			@delete="deleteBoard"
-		></nav-component>
-		<section class="links" v-bind:class="[layout]">
-			<div class="media" v-for="link in links" v-bind:key="`${link.id} ${link.link}`">
-				<div
-					v-if="link.link"
-					class="controls"
-				>
-					<button
-						type="button"
-						name="button"
-						class="reset-button"
-						@click="resetLink(link.id)">Reset</button>
-				</div>
-
-				<input
-					v-if="!link.transformedLink"
-					type="text"
-					placeholder="Reddit, Subreddit, Imgur, Gfycat, Youtube, Twitch url"
-					:value="link.link"
-					@change="updateLink(link.id, $event.target.value)"
-				>
-
-				<linkbox
-					v-if="link.link"
-					:link="link"
-					@error="linkboxError"
-				></linkbox>
+		<div class="grid">
+			<div class="nav">
+				<nav-component
+					:layout="layout"
+					@changeLayout="changeLayout"
+					@save="saveBoard"
+					@load="loadBoard"
+					@delete="deleteBoard"
+				></nav-component>
 			</div>
-		</section>
+			<section class="links" v-bind:class="[layout]">
+				<div class="media" v-for="link in links" v-bind:key="`${link.id} ${link.link}`">
+					<div
+						v-if="link.link"
+						class="controls"
+					>
+						<button
+							type="button"
+							name="button"
+							class="reset-button"
+							@click="resetLink(link.id)">Reset</button>
+					</div>
+
+					<input
+						v-if="!link.transformedLink"
+						type="text"
+						placeholder="Reddit, Subreddit, Imgur, Gfycat, Youtube, Twitch url"
+						:value="link.link"
+						@change="updateLink(link.id, $event.target.value)"
+					>
+
+					<linkbox
+						v-if="link.link"
+						:link="link"
+						@error="linkboxError"
+					></linkbox>
+				</div>
+			</section>
+		</div>
 		<portal-target name="modals"></portal-target>
 	</div>
 </template>
@@ -115,25 +119,47 @@
 <style lang="scss" scoped>
 	.vuer {
 		height: 100vh;
+		max-height: 100vh;
 		width: 100%;
-		overflow: hidden;
-		display: grid;
-		grid-template-rows: 100%;
-		grid-template-columns: 75px auto;
+
+		.grid {
+			height: 100%;
+			width: 100%;
+			overflow: hidden;
+			display: grid;
+			grid-template-rows: auto 40px;
+			grid-template-columns: 100%;
+
+			@media screen and (min-width: 768px) {
+				grid-template-rows: 100%;
+				grid-template-columns: 60px auto;
+
+			}
+		}
+
+		.nav {
+			grid-row: 2;
+			
+			@media screen and (min-width: 768px) {
+				grid-column: 1;
+				grid-row: 1;
+			}
+		}
 
 		.links {
 			display: grid;
 			grid-template-rows: repeat(1, 100%);
 			grid-template-columns: repeat(1, 100%);
+			height: 100%;
 
 			.media {
-				display: flex;
 				align-items: center;
 				justify-content: center;
 				position: relative;
 				flex-direction: column;
 				width: 100%;
 				height: 100%;
+				display: none;
 
 				&:hover {
 					.controls {
@@ -201,24 +227,49 @@
 				}
 			}
 
+			&.one-by-one {
+				.media:nth-child(1) {
+					display: flex;
+				}
+			}
+
 			&.two-by-one {
 				grid-template-rows: 100%;
 				grid-template-columns: repeat(2, 1fr);
+
+				.media:nth-child(1), .media:nth-child(2) {
+					display: flex;
+				}
 			}
 
 			&.one-by-two {
 				grid-template-rows: repeat(2, minmax(50%, 50%));
 				grid-template-columns: 100%;
+
+				.media:nth-child(1), .media:nth-child(2) {
+					display: flex;
+				}
 			}
 
 			&.two-by-two {
 				grid-template-rows: repeat(2, 50%);
 				grid-template-columns: repeat(2, 50%);
+
+				.media:nth-child(1),
+				.media:nth-child(2),
+				.media:nth-child(3),
+				.media:nth-child(4) {
+					display: flex;
+				}
 			}
 
 			&.three-by-three {
 				grid-template-rows: repeat(3, 33%);
 				grid-template-columns: repeat(3, 33%);
+
+				.media {
+					display: flex;
+				}
 			}
 		}
 

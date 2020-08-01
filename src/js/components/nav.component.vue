@@ -34,13 +34,14 @@
 		   type="button"
 		   name="load"
 		   @click="$modal.show('load-board')">Load</button>
-	   <p class="version">v1.0</p>
+	   <p class="version">v1.1</p>
 
 	   <!-- Modals -->
 		<portal to="modals">
 			<modal
 				name="save-board"
 				height="auto"
+				:adaptive="true"
 			>
 				<section class="modal-state" id="modal-save-name">
 					<form name="save-form" @submit.prevent="saveBoard">
@@ -56,6 +57,7 @@
 				name="load-board"
 				height="auto"
 				:scrollable="true"
+				:adaptive="true"
 				@before-open="beforeLoadModalOpens"
 			>
 				<section class="modal-state" id="modal-load-name">
@@ -136,15 +138,30 @@
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
-		flex-direction: column;
+		flex-direction: row;
+		height: 100%;
+		width: 100%;
+		overflow: scroll hidden;
+
+		@media screen and (min-width: 768px) {
+			flex-direction: column;
+			overflow: hidden;
+
+		}
 
 		button {
-			width: 100%;
-			padding: 1rem 1rem;
-			font-size: 1rem;
+			width: 40%;
+			min-width: 40%;
+			padding: 1rem 0.5rem;
+			font-size: 0.9rem;
 			background: none;
 			border: 0;
 			cursor: pointer;
+
+			@media screen and (min-width: 768px) {
+				width: 100%;
+				min-width: 100%;
+			}
 
 			&:hover {
 				background: darken(pink, 5%);
@@ -161,11 +178,10 @@
 		}
 
 		p.version {
-			color: rgba(0,0,0,0.25);
+			color: rgba(0,0,0,0.75);
 			text-align: center;
-			font-weight: 0.75rem;
-			padding: 0 1rem;
-			font-weight: bold;
+			font-size: 0.75rem;
+			padding: 0.5rem;
 		}
 	}
 

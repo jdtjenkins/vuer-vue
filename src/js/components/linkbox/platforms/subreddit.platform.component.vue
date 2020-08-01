@@ -1,5 +1,8 @@
 <template>
-	<div class="wrapper">
+	<div
+		v-if="currentLink"
+		class="wrapper"
+	>
 		<p
 			v-if="error"
 			class="error"
@@ -24,6 +27,12 @@
 				v-model="intervalTime"
 			>
 			<a
+				:href="currentLink.redditLink"
+				target="_blank"
+			>
+				<i>Reddit</i>
+			</a>
+			<a
 				:href="currentLink.link"
 				target="_blank"
 			>
@@ -39,14 +48,18 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 	import axios from 'axios';
 
 	// Components
 	import { Carousel, Slide } from 'vue-carousel';
 
 	// Utils
-	import { LinkUtils } from '../../../utils/link.utils';
+	import { LinkUtils, Link } from '../../../utils/link.utils';
+
+	interface LinkWithRedditLink extends Link {
+		redditLink?: string;
+	}
 
 	export default {
 		name: 'subreddit-platform',
@@ -107,7 +120,10 @@
 					}
 
 					try {
-						const linkData = await LinkUtils.linkSwitch(child.data.url);
+						const link = child.data.url;
+						const redditLink = `https://www.reddit.com${ child.data.permalink }`;
+						const linkData: LinkWithRedditLink = await LinkUtils.linkSwitch(link);
+						linkData.redditLink = redditLink;
 
 						if (linkData) {
 							links.push(linkData);
@@ -187,8 +203,8 @@
 
 				i {
 					display: inline-block;
-					line-height: 0;
-					margin-bottom: 12px;
+					line-height: 1rem;
+					font-style: initial;
 				}
 			}
 
@@ -200,7 +216,7 @@
 			input {
 				border: none;
 				border-bottom: 1px solid #fff;
-				background: 0;
+				background: rgba(0,0,0,0.2);
 				color: #fff;
 				width: 100px;
 				text-align: center;
